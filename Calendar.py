@@ -18,36 +18,18 @@ class Calendario:
         self.fechas = []
 
     def formatoCorrectoAño(self, año):
-        if (año < 0):
-            print("El año debe ser un número mayor a 0, ya que no hay años negativos");
-            return False;
-        if (not isinstance(año, int)):
-            print("El año debe ser un número entero positivo");
-            return False;
         if (año < 1582):
             print("Las fechas anteriores a 1582 no serán consideradas");
             return False;
         return True;
 
     def formatoCorrectoMes(self, mes):
-        if (mes < 0):
-            print("El mes debe ser un número mayor a 0, ya que no hay meses negativos");
-            return False;
-        if (not isinstance(mes, int)):
-            print("El mes debe ser un número entero positivo");
-            return False;
         if (mes > 12):
             print("Los meses no deben ser mayores a 12");
             return False;
         return True;
 
     def formatoCorrectoDia(self, dia, diaFinal):
-        if (dia < 0):
-            print("El día debe ser un número mayor a 0, ya que no hay días negativos");
-            return False;
-        if (not isinstance(dia, int)):
-            print("El día debe ser un número entero positivo");
-            return False;
         if (dia > diaFinal):
             print("No hay tantos días ese mes");
             return False;
@@ -151,7 +133,7 @@ class Calendario:
         if (not self.formatoCorrectoAño(año)):
             return -1;
         while(añoInicio < año):
-            if (self.esBisiesto(añoInicio)):
+            if (self.esBisiesto(añoInicio) or (añoInicio % 100 == 0)):
                 dia += 2;
             else:
                 dia += 1;
@@ -165,15 +147,42 @@ class Calendario:
 
 calendar = Calendario()
 
-def consultarBisiestos():
-    bisiesto = False;
+# Función que solicita el año, mes, día y los returna en una tupla. O retorna un False.
+def solicitaDatos():
+    año = mes = dia = 0;
     print("******************************** ");
     try:
         año = int(input("Por favor digite el año: "));
+        mes = int(input("Por favor digite el mes: "));
+        dia = int(input("Por favor digite el día: "));
+        if (año <= 0 or mes <= 0 or dia <= 0):
+            print("No se aceptan valores negativos o equivalentes a 0");
+            return False;
+    except ValueError:
+        print("Escribió mal un dato. Vuelva a intentarlo");
+        return False;
+    print("\n");
+    return (año, mes, dia);
+
+def solicitaUnDato():
+    año = 0;
+    print("******************************** ");
+    try:
+        año = int(input("Por favor digite el año: "));
+        if (año <= 0):
+            print("No se aceptan valores negativos o equivalentes a 0");
+            return False;
     except ValueError:
         print("Escribió mal el año. Vuelva a intentarlo");
         return False;
     print("\n");
+    return año;
+
+def consultarBisiestos():
+    bisiesto = False;
+    año = solicitaUnDato(); # Solicita al usuario que escriba el año.
+    if (año == False):
+        return False;
     # Obtenga el  estado para comprobar si es un año bisiesto.
     bisiesto = calendar.esBisiesto(año);
     if (bisiesto == True):
@@ -186,16 +195,9 @@ def consultarFecha():
     fechaValida = (0, 0, 0);
     año = mes = dia = 0;
     valida = False;
-    print("******************************** ");
-    try:
-        año = int(input("Por favor digite el año: "));
-        mes = int(input("Por favor digite el mes: "));
-        dia = int(input("Por favor digite el día: "));
-    except ValueError:
-        print("Escribió mal un dato. Vuelva a intentarlo");
+    fechaValida = solicitaDatos() # Solicita al usuario que escriba los datos.
+    if (fechaValida == False):
         return False;
-    print("\n");
-    fechaValida = (año, mes, dia);
     # Obtenga el  estado para comprobar si es una fecha valida.
     valida = calendar.esFechaValida(fechaValida);
     if (valida):
@@ -208,16 +210,9 @@ def siguiente():
     nuevaFecha = (0, 0, 0);
     año = mes = dia = 0;
     valida = False;
-    print("******************************** ");
-    try:
-        año = int(input("Por favor digite el año: "));
-        mes = int(input("Por favor digite el mes: "));
-        dia = int(input("Por favor digite el día: "));
-    except ValueError:
-        print("Escribió mal un dato. Vuelva a intentarlo");
+    fechaValida = solicitaDatos() # Solicita al usuario que escriba los datos.
+    if (fechaValida == False):
         return False;
-    print("\n");
-    fechaValida = (año, mes, dia);
     # Obtenga una nueva fecha.
     nuevaFecha = calendar.diaSiguiente(fechaValida);
     if (nuevaFecha == (-1, -1, -1)):
@@ -229,16 +224,9 @@ def contarDias():
     fechaValida = (0, 0, 0);
     año = mes = dia = diasTotales = 0;
     valida = False;
-    print("********************************");
-    try:
-        año = int(input("Por favor digite el año: "));
-        mes = int(input("Por favor digite el mes: "));
-        dia = int(input("Por favor digite el día: "));
-    except ValueError:
-        print("Escribió mal un dato. Vuelva a intentarlo");
+    fechaValida = solicitaDatos() # Solicita al usuario que escriba los datos.
+    if (fechaValida == False):
         return False;
-    print("\n");
-    fechaValida = (año, mes, dia);
     # Obtenga los días que han pasado.
     diasTotales = calendar.contarDiasPasados(fechaValida);
     if (diasTotales >= 0):
@@ -249,13 +237,9 @@ def contarDias():
 def diaSemana():
     dia = 0;
     text = "El primero de la semana del ";
-    print(" ******************************** ");
-    try:
-        año = int(input("Por favor digite el año: "));
-    except ValueError:
-        print("Escribió mal el año. Vuelva a intentarlo");
+    año = solicitaUnDato(); # Solicita al usuario que escriba el año.
+    if (año == False):
         return False;
-    print("\n");
     text += "(" + str(año) + ")";
     # Obtenga el día de la semana del primero de Enero
     dia = calendar.diaPrimeroEnero(año); 
